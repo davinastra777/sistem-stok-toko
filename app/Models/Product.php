@@ -13,4 +13,25 @@ class Product extends Model
         'jumlah stok',
         'harga',
     ];
+
+    public function shippingLabelItems()
+    {
+        return $this->hasMany(ShippingLabelItem::class);
+    }
+
+    public function offlineTransactionItems()
+    {
+        return $this->hasMany(OfflineTransactionItem::class);
+    }
+
+    // Accessor untuk stock
+    public function getStockAttribute()
+    {
+        return $this->{'jumlah stok'};
+    }
+
+    public function setStockAttribute($value)
+    {
+        $this->{'jumlah stok'} = $value;
+    }
 }

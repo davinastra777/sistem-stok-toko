@@ -14,11 +14,9 @@ class AppServiceProvider extends ServiceProvider
         //
     }
 
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
-        //
+        \App\Models\ShippingLabelItem::observe(\App\Observers\StockObserver::class);
+        \App\Models\OfflineTransactionItem::observe(\App\Observers\OfflineTransactionItemObserver::class);
     }
 }
