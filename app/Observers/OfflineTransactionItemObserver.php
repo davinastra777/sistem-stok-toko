@@ -6,9 +6,7 @@ use App\Models\OfflineTransactionItem;
 
 class OfflineTransactionItemObserver
 {
-    /**
-     * Handle the OfflineTransactionItem "updated" event.
-     */
+
     public function updated(OfflineTransactionItem $offlineTransactionItem): void
     {
         $originalQty = $offlineTransactionItem->getOriginal('qty');
@@ -38,9 +36,6 @@ class OfflineTransactionItemObserver
         $product->save();
     }
 
-    /**
-     * Handle the OfflineTransactionItem "deleted" event.
-     */
     public function deleted(OfflineTransactionItem $offlineTransactionItem): void
     {
         $product = $offlineTransactionItem->product;
@@ -50,9 +45,6 @@ class OfflineTransactionItemObserver
         }
     }
 
-    /**
-     * Handle the OfflineTransactionItem "restored" event.
-     */
     public function restored(OfflineTransactionItem $offlineTransactionItem): void
     {
         $product = $offlineTransactionItem->product;
@@ -62,9 +54,6 @@ class OfflineTransactionItemObserver
         }
     }
 
-    /**
-     * Handle the OfflineTransactionItem "force deleted" event.
-     */
     public function forceDeleted(OfflineTransactionItem $offlineTransactionItem): void
     {
         $product = $offlineTransactionItem->product;

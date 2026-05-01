@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 use Smalot\PdfParser\Parser;
 use App\Filament\Resources\ShippingLabelResource\Pages;
 use App\Models\Product;
+use App\Models\ShippingLabel;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;

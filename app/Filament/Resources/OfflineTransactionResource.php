@@ -12,6 +12,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\DB; // Tambahkan ini
 
 class OfflineTransactionResource extends Resource
 {
@@ -38,6 +39,7 @@ class OfflineTransactionResource extends Resource
                 Forms\Components\Section::make('Produk')
                     ->schema([
                         Forms\Components\Repeater::make('items')
+                            // Baris relationship tetap dikomentari karena kita handle manual di Pages
                             ->label('Daftar Produk')
                             ->schema([
                                 Forms\Components\Select::make('product_id')
@@ -56,7 +58,7 @@ class OfflineTransactionResource extends Resource
                             ->defaultItems(1)
                             ->minItems(1)
                             ->addActionLabel('Tambah Produk'),
-                    ]),
+                        ]),
             ]);
     }
 
@@ -85,11 +87,39 @@ class OfflineTransactionResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\DeleteAction::make()
+                    ->before(function (OfflineTransaction $record) {
+                        // Kembalikan stok sebelum data dihapus
+                        DB::transaction(function () use ($record) {
+                            foreach ($record->items as $item) {
+                                $product = Product::find($item->product_id);
+                                if ($product) {
+                                    // Gunakan nama kolom dengan spasi sesuai model Anda
+                                    $product->increment('jumlah stok', $item->qty);
+                                }
+                            }
+                            // Hapus item detail agar bersih
+                            $record->items()->delete();
+                        });
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->before(function (\Illuminate\Database\Eloquent\Collection $records) {
+                            // Loop setiap transaksi yang dicentang
+                            DB::transaction(function () use ($records) {
+                                foreach ($records as $record) {
+                                    foreach ($record->items as $item) {
+                                        $product = Product::find($item->product_id);
+                                        if ($product) {
+                                            $product->increment('jumlah stok', $item->qty);
+                                        }
+                                    }
+                                    $record->items()->delete();
+                                }
+                            });
+                        }),
                 ]),
             ]);
     }

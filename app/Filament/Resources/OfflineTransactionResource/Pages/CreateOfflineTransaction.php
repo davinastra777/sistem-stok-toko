@@ -27,11 +27,10 @@ class CreateOfflineTransaction extends CreateRecord
             }
 
             $product = Product::find($productId);
-            if (!$product) {
-                $this->halt('Produk tidak ditemukan.');
+            if ($product) {
+                // Menggunakan nama kolom sesuai database Anda
+                $total += $product->harga * $qty;
             }
-
-            $total += $product->harga * $qty;
         }
 
         $data['total_amount'] = $total;
@@ -43,17 +42,26 @@ class CreateOfflineTransaction extends CreateRecord
     {
         try {
             return DB::transaction(function () use ($data) {
-
                 $items = $data['items'] ?? [];
 
+                // Cek jika repeater kosong
                 if (empty($items)) {
-                    throw new \Exception('Minimal 1 produk harus ditambahkan.');
+                    Notification::make()
+                        ->title('Error')
+                        ->body('Minimal 1 produk harus ditambahkan.')
+                        ->danger()
+                        ->send();
+
+                    $this->halt();
                 }
 
+                // Pisahkan data items agar tidak ikut masuk ke create OfflineTransaction
                 unset($data['items']);
 
+                // 1. Buat Header Transaksi
                 $transaction = static::getModel()::create($data);
 
+                // 2. Proses setiap Produk
                 foreach ($items as $item) {
                     $productId = $item['product_id'] ?? null;
                     $qty = isset($item['qty']) ? (int) $item['qty'] : 0;
@@ -63,38 +71,38 @@ class CreateOfflineTransaction extends CreateRecord
                     }
 
                     $product = Product::find($productId);
+
                     if (!$product) {
-                        throw new \Exception('Produk tidak ditemukan.');
+                        throw new \Exception("Produk dengan ID {$productId} tidak ditemukan.");
                     }
 
-                    // 🔥 FIX FIELD SPASI
+                    // Cek Stok (Gunakan nama kolom dengan spasi sesuai model)
                     if ($product->{'jumlah stok'} < $qty) {
-                        throw new \Exception(
-                            "Stok {$product->{'nama produk'}} tidak cukup. Stok tersedia: {$product->{'jumlah stok'}}"
-                        );
+                        throw new \Exception("Stok {$product->{'nama produk'}} tidak mencukupi (Sisa: {$product->{'jumlah stok'}}).");
                     }
 
-                    // simpan item
+                    // Simpan Item Transaksi (Relasi hasMany)
                     $transaction->items()->create([
                         'product_id' => $product->id,
                         'qty' => $qty,
                     ]);
 
-                    // 🔥 FIX KURANGI STOK (TIDAK BISA decrement)
-                    $product->{'jumlah stok'} -= $qty;
-                    $product->save();
+                    // Potong Stok
+                    $product->decrement('jumlah stok', $qty);
                 }
 
                 return $transaction;
             });
         } catch (\Throwable $e) {
+            // Jika ada error (termasuk stok kurang), batalkan semua transaksi
             Notification::make()
                 ->title('Gagal membuat transaksi')
                 ->danger()
                 ->body($e->getMessage())
                 ->send();
 
-            throw $e;
+            $this->halt();
+            return static::getModel()::make();
         }
     }
 
