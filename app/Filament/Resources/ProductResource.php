@@ -29,7 +29,7 @@ class ProductResource extends Resource
                 Forms\Components\TextInput::make('id produk')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('jumlah stok')
+                Forms\Components\TextInput::make('jumlah_stok')
                     ->required()
                     ->numeric()
                     ->default(0),
