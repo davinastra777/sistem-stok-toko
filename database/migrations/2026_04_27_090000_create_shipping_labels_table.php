@@ -9,16 +9,16 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-   public function up(): void
-{
-    Schema::create('shipping_labels', function (Blueprint $table) {
-        $table->id();
-        $table->string('image');        
-        $table->text('raw_text')->nullable(); 
-        $table->json('items')->nullable();
-        $table->timestamps();
-    });
-}
+    public function up(): void
+    {
+        Schema::create('shipping_labels', function (Blueprint $table) {
+            $table->id();
+            $table->string('image_path');
+            $table->text('raw_text')->nullable();
+            $table->json('items')->nullable();
+            $table->timestamps();
+        });
+    }
 
     /**
      * Reverse the migrations.

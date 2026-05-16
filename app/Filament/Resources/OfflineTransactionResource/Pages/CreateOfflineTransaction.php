@@ -26,10 +26,9 @@ class CreateOfflineTransaction extends CreateRecord
                 continue;
             }
 
-            $product = Product::find($productId);
+            $product = Product::query()->find($productId);
             if ($product) {
-                // Menggunakan nama kolom sesuai database Anda
-                $total += $product->harga * $qty;
+                $total += ($product->harga_offline ?? $product->harga ?? 0) * $qty;
             }
         }
 
@@ -70,7 +69,7 @@ class CreateOfflineTransaction extends CreateRecord
                         continue;
                     }
 
-                    $product = Product::find($productId);
+                    $product = Product::query()->find($productId);
 
                     if (!$product) {
                         throw new \Exception("Produk dengan ID {$productId} tidak ditemukan.");
@@ -88,7 +87,9 @@ class CreateOfflineTransaction extends CreateRecord
                     ]);
 
                     // Potong Stok
-                    $product->decrement('jumlah stok', $qty);
+                    DB::table('products')
+                        ->where('id', $product->id)
+                        ->decrement('jumlah_stok', $qty);
                 }
 
                 return $transaction;

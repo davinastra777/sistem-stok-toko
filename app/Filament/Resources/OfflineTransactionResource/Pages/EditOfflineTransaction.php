@@ -41,7 +41,7 @@ class EditOfflineTransaction extends EditRecord
         $total = 0;
 
         foreach ($items as $item) {
-            $product = Product::find($item['product_id']);
+            $product = Product::query()->find($item['product_id']);
             if ($product) {
                 $total += $product->harga * ($item['qty'] ?? 0);
             }
@@ -63,7 +63,7 @@ class EditOfflineTransaction extends EditRecord
                 // Simpan dulu info stok asli gudang untuk keperluan notifikasi jika error
                 $actualStock = [];
                 foreach ($itemsData as $item) {
-                    $p = Product::find($item['product_id']);
+                    $p = Product::query()->find($item['product_id']);
                     if ($p) {
                         $actualStock[$p->id] = $p->{'jumlah stok'};
                     }
@@ -71,9 +71,11 @@ class EditOfflineTransaction extends EditRecord
 
                 // Kembalikan stok lama (Reset stok sementara di DB)
                 foreach ($record->items as $oldItem) {
-                    $product = Product::find($oldItem->product_id);
+                    $product = Product::query()->find($oldItem->product_id);
                     if ($product) {
-                        $product->increment('jumlah stok', $oldItem->qty);
+                        DB::table('products')
+                            ->where('id', $product->id)
+                            ->increment('jumlah_stok', $oldItem->qty);
                     }
                 }
 
@@ -82,7 +84,7 @@ class EditOfflineTransaction extends EditRecord
 
                 // Validasi dengan menggunakan referensi stok asli untuk pesan error
                 foreach ($itemsData as $item) {
-                    $product = Product::find($item['product_id']);
+                    $product = Product::query()->find($item['product_id']);
 
                     if (!$product) throw new \Exception("Produk tidak ditemukan.");
 
@@ -98,7 +100,9 @@ class EditOfflineTransaction extends EditRecord
                         'qty' => $item['qty'],
                     ]);
 
-                    $product->decrement('jumlah stok', $item['qty']);
+                    DB::table('products')
+                        ->where('id', $product->id)
+                        ->decrement('jumlah_stok', $item['qty']);
                 }
 
                 return $record;
