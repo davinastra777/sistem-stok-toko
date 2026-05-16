@@ -34,13 +34,13 @@ class AdminPanelProvider extends PanelProvider
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
                 Pages\Dashboard::class,
+                \App\Filament\Pages\TransactionHistory::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
-                Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
+                \App\Filament\Widgets\LaporanPenjualanOmzet::class,
                 \App\Filament\Widgets\RingkasanStok::class,
                 \App\Filament\Widgets\ProdukStokMenipis::class,
+                \App\Filament\Widgets\LaporanPenjualanChart::class,
             ])
             ->middleware([
                 EncryptCookies::class,

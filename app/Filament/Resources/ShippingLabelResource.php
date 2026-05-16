@@ -19,13 +19,17 @@ class ShippingLabelResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    protected static ?string $navigationGroup = 'Transaksi';
+
+    protected static ?string $navigationLabel = 'Transaksi Online';
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 \Filament\Forms\Components\Section::make('Upload Dokumen')
                     ->schema([
-                        \Filament\Forms\Components\FileUpload::make('image')
+                        \Filament\Forms\Components\FileUpload::make('image_path')
                             ->label('Pilih File PDF Resi')
                             ->acceptedFileTypes(['application/pdf'])
                             ->required()
@@ -40,56 +44,107 @@ class ShippingLabelResource extends Resource
             $text = $pdf->getText();
             $set('raw_text', $text);
 
-        $items = [];
+            $items = [];
+            $text = preg_replace('/\r\n|\r/', "\n", $text);
+            $lines = array_values(array_map('trim', explode("\n", $text)));
+            $inProductSection = false;
 
-    $sections = explode('Nama Produk', $text);
+            for ($i = 0; $i < count($lines); $i++) {
+                $line = $lines[$i];
 
-    foreach ($sections as $section) {
-
-        if (strlen(trim($section)) < 50) continue;
-
-        $endPos = stripos($section, 'Pesan:');
-        if ($endPos !== false) {
-            $section = substr($section, 0, $endPos);
-        }
-
-        $lines = array_values(array_filter(array_map('trim', explode("\n", $section))));
-
-        for ($i = 0; $i < count($lines); $i++) {
-
-            if (preg_match('/^\d+(.*)/', $lines[$i], $match)) {
-
-                $namaProduk = trim($match[1]);
-
-                $namaProduk = preg_replace('/^\d+/', '', $namaProduk);
-
-                while (isset($lines[$i + 1]) && !is_numeric($lines[$i + 1])) {
-                    $namaProduk .= ' ' . $lines[$i + 1];
-                    $i++;
+                if (stripos($line, '#Nama Produk') !== false || stripos($line, 'Nama Produk') !== false) {
+                    $inProductSection = true;
+                    continue;
                 }
-                if (isset($lines[$i + 1]) && is_numeric($lines[$i + 1])) {
 
-                    $qty = (int) $lines[$i + 1];
+                if (! $inProductSection) {
+                    continue;
+                }
 
-                    if (
-                        str_contains($namaProduk, 'Berat') ||
-                        str_contains($namaProduk, 'Batas Kirim') ||
-                        str_contains($namaProduk, 'KOTA')
-                    ) {
-                        continue;
+                if (stripos($line, 'Pesan:') !== false) {
+                    $inProductSection = false;
+                    continue;
+                }
+
+                if (! preg_match('/^\d+/', $line)) {
+                    continue;
+                }
+
+                $line = preg_replace('/^\d+\s*/', '', $line);
+                $namaProduk = $line;
+                $qty = null;
+                $hasLineQty = false;
+
+                if (preg_match('/^(.*?)(?:\t+|\s{2,})(\d+)$/', $line, $match)) {
+                    $namaProduk = trim($match[1]);
+                    $qty = (int) $match[2];
+                    $hasLineQty = true;
+                }
+
+                while (isset($lines[$i + 1]) && trim($lines[$i + 1]) !== '' && ! preg_match('/^\d+/', $lines[$i + 1])) {
+                    $nextLine = trim($lines[$i + 1]);
+
+                    if (stripos($nextLine, 'Pesan:') !== false) {
+                        $inProductSection = false;
+                        break;
                     }
 
-                    $items[] = [
-                        'produk' => preg_replace('/\s+/', ' ', $namaProduk),
+                    if (preg_match('/^\d+$/', $nextLine)) {
+                        $qty = (int) $nextLine;
+                        $i++;
+                        break;
+                    }
+
+                    if ($hasLineQty) {
+                        break;
+                    }
+
+                    $namaProduk .= ' ' . $nextLine;
+                    $i++;
+                }
+
+                if ($qty === null && isset($lines[$i + 1]) && preg_match('/^\d+$/', trim($lines[$i + 1]))) {
+                    $qty = (int) trim($lines[++$i]);
+                }
+
+                if ($qty === null && ! $hasLineQty && preg_match('/^(.*\D)\s+(\d+)$/', $namaProduk, $match)) {
+                    $namaProduk = trim($match[1]);
+                    $qty = (int) $match[2];
+                }
+
+                if ($qty === null) {
+                    continue;
+                }
+
+                $namaProduk = ShippingLabel::normalizeProductName($namaProduk);
+                $upperName = strtoupper($namaProduk);
+
+                if ($qty < 1) {
+                    continue;
+                }
+
+                if (
+                    str_contains($upperName, 'BERAT') ||
+                    str_contains($upperName, 'BATAS KIRIM') ||
+                    str_contains($upperName, 'KOTA') ||
+                    str_contains($upperName, 'SKU VARIASI') ||
+                    str_contains($upperName, 'PESAN:')
+                ) {
+                    continue;
+                }
+
+                $key = mb_strtoupper($namaProduk, 'UTF-8');
+                if (isset($items[$key])) {
+                    $items[$key]['qty'] += $qty;
+                } else {
+                    $items[$key] = [
+                        'produk' => $namaProduk,
                         'qty' => $qty,
                     ];
-
-                    $i++; 
                 }
             }
-        }
-    }
-            $set('items', $items);
+
+            $set('items', array_values($items));
             
         } catch (\Exception $e) {
             $set('raw_text', 'Gagal membaca PDF: ' . $e->getMessage());
@@ -126,7 +181,7 @@ class ShippingLabelResource extends Resource
 {
     return $table
         ->columns([
-            \Filament\Tables\Columns\IconColumn::make('image')
+            \Filament\Tables\Columns\IconColumn::make('image_path')
                 ->label('File PDF')
                 ->icon('heroicon-o-document-text')
                 ->color('primary'),

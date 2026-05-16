@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('offline_transaction_items', function (Blueprint $table) {
-            $table->dropColumn('price');
-        });
+        if (Schema::hasColumn('offline_transaction_items', 'price')) {
+            Schema::table('offline_transaction_items', function (Blueprint $table) {
+                $table->dropColumn('price');
+            });
+        }
     }
 
     /**
@@ -21,8 +23,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('offline_transaction_items', function (Blueprint $table) {
-            $table->decimal('price', 10, 2)->after('qty');
-        });
+        if (! Schema::hasColumn('offline_transaction_items', 'price')) {
+            Schema::table('offline_transaction_items', function (Blueprint $table) {
+                $table->decimal('price', 10, 2)->after('qty');
+            });
+        }
     }
 };

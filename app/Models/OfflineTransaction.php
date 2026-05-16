@@ -9,6 +9,10 @@ class OfflineTransaction extends Model
 {
     protected $fillable = ['transaction_date', 'total_amount', 'notes'];
 
+    protected $casts = [
+        'transaction_date' => 'date',
+    ];
+
     public function items()
     {
         return $this->hasMany(OfflineTransactionItem::class, 'offline_transaction_id');
@@ -21,11 +25,13 @@ class OfflineTransaction extends Model
             DB::transaction(function () use ($transaction) {
                 // 1. Ambil semua item terkait dan kembalikan stoknya ke tabel produk
                 foreach ($transaction->items as $item) {
-                    $product = Product::find($item->product_id);
+                    $product = Product::query()->find($item->product_id);
                     
                     if ($product) {
                         // Tambahkan kembali stok sesuai qty yang dihapus
-                        $product->increment('jumlah stok', $item->qty);
+                        DB::table('products')
+                            ->where('id', $product->id)
+                            ->increment('jumlah_stok', $item->qty);
                     }
                 }
 

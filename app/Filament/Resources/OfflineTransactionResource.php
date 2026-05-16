@@ -20,6 +20,10 @@ class OfflineTransactionResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    protected static ?string $navigationGroup = 'Transaksi';
+
+    protected static ?string $navigationLabel = 'Transaksi Offline';
+
     public static function form(Form $form): Form
     {
         return $form
@@ -92,11 +96,9 @@ class OfflineTransactionResource extends Resource
                         // Kembalikan stok sebelum data dihapus
                         DB::transaction(function () use ($record) {
                             foreach ($record->items as $item) {
-                                $product = Product::find($item->product_id);
-                                if ($product) {
-                                    // Gunakan nama kolom dengan spasi sesuai model Anda
-                                    $product->increment('jumlah stok', $item->qty);
-                                }
+                                DB::table('products')
+                                    ->where('id', $item->product_id)
+                                    ->increment('jumlah_stok', $item->qty);
                             }
                             // Hapus item detail agar bersih
                             $record->items()->delete();
@@ -111,10 +113,9 @@ class OfflineTransactionResource extends Resource
                             DB::transaction(function () use ($records) {
                                 foreach ($records as $record) {
                                     foreach ($record->items as $item) {
-                                        $product = Product::find($item->product_id);
-                                        if ($product) {
-                                            $product->increment('jumlah stok', $item->qty);
-                                        }
+                                        DB::table('products')
+                                            ->where('id', $item->product_id)
+                                            ->increment('jumlah_stok', $item->qty);
                                     }
                                     $record->items()->delete();
                                 }
