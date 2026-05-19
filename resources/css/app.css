@@ -258,3 +258,24 @@
     ::-webkit-scrollbar-thumb { background-color: #d1d5db; border-radius: 9999px; }
     .dark ::-webkit-scrollbar-thumb { background-color: #374151; }
 }
+
+
+aside.fi-sidebar {
+    background-color: #0f172a !important; /* Warna hitam kebiruan gelap (Slate 900) */
+}
+
+/* 2. Mengubah warna teks & icon di menu agar terlihat (menjadi putih/terang) */
+aside.fi-sidebar .fi-sidebar-item-label,
+aside.fi-sidebar .fi-sidebar-item-icon {
+    color: #e2e8f0 !important;
+}
+
+/* 3. Saat menu di-hover (disentuh mouse) agar lebih terang sedikit */
+aside.fi-sidebar .fi-sidebar-item-button:hover {
+    background-color: #1e293b !important;
+}
+
+/* 4. Mengubah warna background utama (halaman sebelah kanan) */
+main.fi-main {
+    background-color: #f8fafc !important; /* Warna abu-abu sangat terang */
+}

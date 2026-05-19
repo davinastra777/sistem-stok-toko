@@ -1,4 +1,4 @@
-<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 p-4">
+﻿<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 p-4">
     <div class="w-full max-w-md">
 
         {{-- Logo / Branding --}}
@@ -7,29 +7,28 @@
                 <img 
                     src="{{ asset('images/logo.png') }}" 
                     alt="Logo Toko Kerupuk Kemplang HG"
-                    class="h-20 w-auto mx-auto object-contain"
+                    class="h-15 w-auto mx-auto object-contain"
                 >
             </div>
             <h1 class="text-xl font-bold text-slate-800">Toko Kerupuk Kemplang HG</h1>
-            <p class="text-sm text-slate-500 mt-1">Sistem Manajemen Toko</p>
         </div>
 
         {{-- Card Login --}}
-        <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/60 ring-1 ring-slate-100 p-8">
-            <h2 class="text-2xl font-bold text-slate-900 mb-1">Masuk</h2>
-            <p class="text-sm text-slate-500 mb-6">Masukkan email dan kata sandi Anda</p>
+        <div class="bg-white rounded-3xl shadow-xl ring-1 ring-slate-100 p-8">
+
 
             <x-filament-panels::form id="form" wire:submit="authenticate">
-                {{ $this->form }}
+                <div class="space-y-4">
+                    {{ $this->form }}
 
-                <x-filament::button
-                    type="submit"
-                    class="mt-6 w-full"
-                    size="lg"
-                    style="background: linear-gradient(135deg, #f97316, #f59e0b); border: none;"
-                >
-                    Masuk ke Sistem
-                </x-filament::button>
+                    <x-filament::button
+                        type="submit"
+                        class="mt-2 w-full bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600 focus:outline-none focus:ring-2 focus:ring-amber-300"
+                        size="lg"
+                    >
+                        Masuk ke Sistem
+                    </x-filament::button>
+                </div>
             </x-filament-panels::form>
         </div>
 
