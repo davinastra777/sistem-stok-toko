@@ -10,8 +10,8 @@ use Illuminate\Support\Facades\Schema;
 
 class LaporanStokKeluarChart extends LineChartWidget
 {
-    protected static ?string $heading = 'Stok Keluar 7 Hari Terakhir';
-    protected static ?string $description = 'Jumlah produk keluar setiap hari dari transaksi offline dan online.';
+    // protected static ?string $heading = 'Stok Keluar 7 Hari Terakhir';
+    // protected static ?string $description = 'Jumlah produk keluar setiap hari dari transaksi offline dan online.';
     protected static ?string $maxHeight = '320px';
     protected int | string | array $columnSpan = [
         'default' => 12,
@@ -48,7 +48,7 @@ class LaporanStokKeluarChart extends LineChartWidget
                 ->sum('qty');
 
             $dailyOnlineQty = ShippingLabel::query()
-                ->whereBetween('created_at', [$date->startOfDay(), $date->endOfDay()])
+                ->whereBetween('created_at', [$date->copy()->startOfDay(), $date->copy()->endOfDay()])
                 ->get()
                 ->sum(function (ShippingLabel $label) {
                     return collect($label->items)->sum(fn ($item) => (int) ($item['qty'] ?? 0));

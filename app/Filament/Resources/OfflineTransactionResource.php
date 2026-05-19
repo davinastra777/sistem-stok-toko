@@ -12,7 +12,8 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Support\Facades\DB; // Tambahkan ini
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class OfflineTransactionResource extends Resource
 {
@@ -23,6 +24,11 @@ class OfflineTransactionResource extends Resource
     protected static ?string $navigationGroup = 'Transaksi';
 
     protected static ?string $navigationLabel = 'Transaksi Offline';
+
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->role === 'admin';
+    }
 
     public static function form(Form $form): Form
     {
@@ -43,18 +49,20 @@ class OfflineTransactionResource extends Resource
                 Forms\Components\Section::make('Produk')
                     ->schema([
                         Forms\Components\Repeater::make('items')
-                            // Baris relationship tetap dikomentari karena kita handle manual di Pages
                             ->label('Daftar Produk')
                             ->schema([
                                 Forms\Components\Select::make('product_id')
                                     ->label('Produk')
-                                    ->options(Product::pluck('nama produk', 'id'))
+                                    // PERBAIKAN 1: Hanya produk yang berstatus aktif (1) akan dipaparkan
+                                    ->options(Product::where('status', true)->pluck('nama produk', 'id'))
                                     ->searchable()
                                     ->required(),
 
                                 Forms\Components\TextInput::make('qty')
                                     ->label('Qty')
                                     ->numeric()
+                                    // PERBAIKAN 2: Tukar nilai default kepada 0
+                                    ->default(0)
                                     ->minValue(1)
                                     ->required(),
                             ])
@@ -62,7 +70,7 @@ class OfflineTransactionResource extends Resource
                             ->defaultItems(1)
                             ->minItems(1)
                             ->addActionLabel('Tambah Produk'),
-                        ]),
+                    ]),
             ]);
     }
 
@@ -93,14 +101,12 @@ class OfflineTransactionResource extends Resource
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make()
                     ->before(function (OfflineTransaction $record) {
-                        // Kembalikan stok sebelum data dihapus
                         DB::transaction(function () use ($record) {
                             foreach ($record->items as $item) {
                                 DB::table('products')
                                     ->where('id', $item->product_id)
                                     ->increment('jumlah_stok', $item->qty);
                             }
-                            // Hapus item detail agar bersih
                             $record->items()->delete();
                         });
                     }),
@@ -109,7 +115,6 @@ class OfflineTransactionResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
                         ->before(function (\Illuminate\Database\Eloquent\Collection $records) {
-                            // Loop setiap transaksi yang dicentang
                             DB::transaction(function () use ($records) {
                                 foreach ($records as $record) {
                                     foreach ($record->items as $item) {

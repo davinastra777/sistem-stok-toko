@@ -10,19 +10,21 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class RingkasanStok extends BaseWidget
 {
-    protected ?string $heading = 'Ringkasan Gudang';
-    protected ?string $description = 'Metrik stok dan aktivitas transaksi terbaru untuk membantu kendalikan persediaan.';
+    // protected ?string $heading = 'Ringkasan Gudang';
+    // protected ?string $description = 'Metrik stok dan aktivitas transaksi terbaru untuk membantu kendalikan persediaan.';
     protected int | string | array $columnSpan = [
         'default' => 12,
-        'md' => 6,
-        'lg' => 3,
+        'md' => 12,
+        'lg' => 12,
     ];
 
     protected function getStats(): array
     {
         $totalStok = Product::query()->sum('jumlah_stok') ?? 0;
         $lowStockCount = Product::query()->where('jumlah_stok', '<', 5)->count() ?? 0;
-        $transactionCount = (OfflineTransaction::query()->count('*') ?? 0) + (ShippingLabel::query()->count('*') ?? 0);
+        $todayOffline = OfflineTransaction::query()->whereDate('created_at', today())->count();
+        $todayShipping = ShippingLabel::query()->whereDate('created_at', today())->count();
+        $transactionCount = $todayOffline + $todayShipping;
 
         return [
             Stat::make('Total Produk', Product::query()->count('*') ?? 0)

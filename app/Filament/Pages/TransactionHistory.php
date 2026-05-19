@@ -13,4 +13,9 @@ class TransactionHistory extends Page
     protected static ?string $navigationLabel = 'Riwayat Transaksi';
 
     protected static string $view = 'filament.pages.transaction-history';
+
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->role === 'admin';
+    }
 }

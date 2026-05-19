@@ -13,89 +13,62 @@ class CreateOfflineTransaction extends CreateRecord
 {
     protected static string $resource = OfflineTransactionResource::class;
 
-    protected function mutateFormDataBeforeCreate(array $data): array
-    {
-        $items = $data['items'] ?? [];
-        $total = 0;
-
-        foreach ($items as $item) {
-            $productId = $item['product_id'] ?? null;
-            $qty = isset($item['qty']) ? (int) $item['qty'] : 0;
-
-            if (!$productId || $qty < 1) {
-                continue;
-            }
-
-            $product = Product::query()->find($productId);
-            if ($product) {
-                $total += ($product->harga_offline ?? $product->harga ?? 0) * $qty;
-            }
-        }
-
-        $data['total_amount'] = $total;
-
-        return $data;
-    }
-
     protected function handleRecordCreation(array $data): Model
     {
         try {
             return DB::transaction(function () use ($data) {
                 $items = $data['items'] ?? [];
 
-                // Cek jika repeater kosong
                 if (empty($items)) {
-                    Notification::make()
-                        ->title('Error')
-                        ->body('Minimal 1 produk harus ditambahkan.')
-                        ->danger()
-                        ->send();
-
-                    $this->halt();
+                    throw new \Exception("Minimal 1 produk harus ditambahkan.");
                 }
 
-                // Pisahkan data items agar tidak ikut masuk ke create OfflineTransaction
+                // Asingkan data items agar Header transaksi bisa terbuat
                 unset($data['items']);
 
                 // 1. Buat Header Transaksi
                 $transaction = static::getModel()::create($data);
 
-                // 2. Proses setiap Produk
+                $totalAmount = 0;
+
+                // 2. Loop produk, hitung total harga, potong stok
                 foreach ($items as $item) {
                     $productId = $item['product_id'] ?? null;
                     $qty = isset($item['qty']) ? (int) $item['qty'] : 0;
 
-                    if (!$productId || $qty < 1) {
-                        continue;
+                    if (!$productId || $qty < 1) continue;
+
+                    $product = Product::find($productId);
+
+                    if (!$product) throw new \Exception("Produk tidak ditemukan.");
+
+                    // Validasi Stok
+                    if ($product->jumlah_stok < $qty) {
+                        $namaProduk = $product->{'nama produk'} ?? 'Produk';
+                        throw new \Exception("Stok {$namaProduk} tidak mencukupi (Sisa: {$product->jumlah_stok}).");
                     }
 
-                    $product = Product::query()->find($productId);
+                    // Ambil harga_offline, kalau 0 ambil harga biasa
+                    $harga = $product->harga_offline > 0 ? $product->harga_offline : ($product->harga ?? 0);
+                    $totalAmount += ($harga * $qty);
 
-                    if (!$product) {
-                        throw new \Exception("Produk dengan ID {$productId} tidak ditemukan.");
-                    }
-
-                    // Cek Stok (Gunakan nama kolom dengan spasi sesuai model)
-                    if ($product->{'jumlah stok'} < $qty) {
-                        throw new \Exception("Stok {$product->{'nama produk'}} tidak mencukupi (Sisa: {$product->{'jumlah stok'}}).");
-                    }
-
-                    // Simpan Item Transaksi (Relasi hasMany)
+                    // Simpan Detail Transaksi
                     $transaction->items()->create([
                         'product_id' => $product->id,
                         'qty' => $qty,
                     ]);
 
                     // Potong Stok
-                    DB::table('products')
-                        ->where('id', $product->id)
-                        ->decrement('jumlah_stok', $qty);
+                    DB::table('products')->where('id', $product->id)->decrement('jumlah_stok', $qty);
                 }
+
+                // 3. Simpan Total Harga ke Database (Aman dari mass assignment)
+                $transaction->total_amount = $totalAmount;
+                $transaction->save();
 
                 return $transaction;
             });
         } catch (\Throwable $e) {
-            // Jika ada error (termasuk stok kurang), batalkan semua transaksi
             Notification::make()
                 ->title('Gagal membuat transaksi')
                 ->danger()
@@ -111,5 +84,4 @@ class CreateOfflineTransaction extends CreateRecord
     {
         return $this->getResource()::getUrl('index');
     }
-    // test
 }
