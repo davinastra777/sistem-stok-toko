@@ -12,6 +12,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 
 class ShippingLabelResource extends Resource
 {
@@ -22,6 +23,11 @@ class ShippingLabelResource extends Resource
     protected static ?string $navigationGroup = 'Transaksi';
 
     protected static ?string $navigationLabel = 'Transaksi Online';
+
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->role === 'admin';
+    }
 
     public static function form(Form $form): Form
     {

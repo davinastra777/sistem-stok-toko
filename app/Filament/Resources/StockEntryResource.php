@@ -14,10 +14,16 @@ use Filament\Tables\Table;
 class StockEntryResource extends Resource
 {
     protected static ?string $model = StockEntry::class;
-
     protected static ?string $navigationIcon = 'heroicon-o-arrow-up';
-
     protected static ?string $navigationLabel = 'Stok Masuk';
+    protected static ?string $navigationGroup = 'Master Data';
+    protected static ?string $modelLabel = 'Stok Masuk';
+    protected static ?string $pluralModelLabel = 'Stok Masuk';
+    
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->role === 'admin';
+    }
 
     public static function form(Form $form): Form
     {
@@ -79,12 +85,19 @@ class StockEntryResource extends Resource
                     ->getStateUsing(fn (StockEntry $record): int => $record->items->sum('qty'))
                     ->sortable(),
 
+                // PERBAIKAN 2: Memaksa pemanggilan nama produk langsung dari database agar tidak hilang/hanya muncul angka
                 Tables\Columns\TextColumn::make('products')
                     ->label('Produk')
-                    ->formatStateUsing(fn (StockEntry $record): string => $record->items
-                        ->map(fn ($item) => $item->product ? $item->product->{'nama produk'} . ' x' . $item->qty : '')
-                        ->filter()
-                        ->join(', '))
+                    ->getStateUsing(function (StockEntry $record): string {
+                        return $record->items
+                            ->map(function ($item) {
+                                // Ambil data produk langsung berdasarkan product_id bypass bug relasi
+                                $product = Product::find($item->product_id);
+                                return $product ? $product->{'nama produk'} : '';
+                            })
+                            ->filter()
+                            ->join(', ');
+                    })
                     ->wrap(),
 
                 Tables\Columns\TextColumn::make('created_at')

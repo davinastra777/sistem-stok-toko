@@ -11,12 +11,21 @@ use Illuminate\Support\Facades\Schema;
 
 class LaporanPenjualanOmzet extends BaseWidget
 {
-    protected ?string $heading = 'Omset Penjualan';
-    protected ?string $description = 'Ringkasan omset offline, online, dan total penjualan.';
+    // protected ?string $heading = 'Omset Penjualan';
+    // protected ?string $description = 'Ringkasan omset offline, online, dan total penjualan.';
+    public function getHeading(): ?string
+    {
+        return null; // Mematikan judul bawaan Filament
+    }
+
+    public function getDescription(): ?string
+    {
+        return null; // Mematikan deskripsi bawaan Filament
+    }
     protected int | string | array $columnSpan = [
         'default' => 12,
-        'md' => 6,
-        'lg' => 3,
+        'md' => 12,
+        'lg' => 12,
     ];
 
     protected function getStats(): array
