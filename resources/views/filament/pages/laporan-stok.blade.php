@@ -5,7 +5,7 @@
         <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-650 p-6 shadow-sm dark:from-indigo-900 dark:to-slate-900 border border-transparent dark:border-gray-800">
             <div class="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
-                    <span class="inline-flex items-center rounded-md bg-white/20 px-2.5 py-0.5 text-xs font-semibold text-white uppercase tracking-wider backdrop-blur-md">
+                    <span class="inline-flex items-center rounded-md bg-black/20 px-2.5 py-0.5 text-xs font-semibold text-white uppercase tracking-wider backdrop-blur-md">
                         Laporan Real-Time
                     </span>
                     <h1 class="mt-2 text-2xl font-bold tracking-tight text-white sm:text-3xl">
@@ -52,8 +52,6 @@
                 />
             </div>
         </div>
-
-        {{-- 3. PANEL DATA RINCIAN TABEL STOK (HANYA SATU DI SINI) --}}
         <div class="rounded-2xl bg-white p-6 shadow-sm border border-gray-100 dark:bg-gray-900 dark:border-gray-800/60">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-gray-100 pb-4 mb-6 dark:border-gray-800 gap-2">
                 <div class="flex items-center gap-3">
@@ -67,14 +65,6 @@
                         <p class="text-xs text-gray-500 dark:text-gray-400">Detail rincian sisa kapasitas produk riil yang tersedia di rak</p>
                     </div>
                 </div>
-            </div>
-
-            <div>
-                <x-filament-widgets::widgets
-                    :columns="['default' => 1]"
-                    :data="[]"
-                    :widgets="[\App\Filament\Widgets\LaporanStokList::class]"
-                />
             </div>
         </div>
 

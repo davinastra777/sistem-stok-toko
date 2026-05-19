@@ -14,6 +14,8 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 
 class OfflineTransactionResource extends Resource
 {
@@ -39,11 +41,15 @@ class OfflineTransactionResource extends Resource
                         Forms\Components\DatePicker::make('transaction_date')
                             ->label('Tanggal Transaksi')
                             ->required()
-                            ->default(now()),
+                            ->default(now())
+                            ->disabled()
+                            ->dehydrated(),
 
                         Forms\Components\Textarea::make('notes')
                             ->label('Catatan')
-                            ->rows(3),
+                            ->required()
+                            ->helperText("Wajib Isi Nama Pembeli")
+                            ->rows(3),  
                     ]),
 
                 Forms\Components\Section::make('Produk')
@@ -53,18 +59,39 @@ class OfflineTransactionResource extends Resource
                             ->schema([
                                 Forms\Components\Select::make('product_id')
                                     ->label('Produk')
-                                    // PERBAIKAN 1: Hanya produk yang berstatus aktif (1) akan dipaparkan
                                     ->options(Product::where('status', true)->pluck('nama produk', 'id'))
                                     ->searchable()
-                                    ->required(),
-
+                                    ->required()
+                                    ->live()
+                                    ->afterStateUpdated(fn (Set $set) => $set('qty', 1)),
+                                    
                                 Forms\Components\TextInput::make('qty')
                                     ->label('Qty')
                                     ->numeric()
-                                    // PERBAIKAN 2: Tukar nilai default kepada 0
-                                    ->default(0)
+                                    ->default(1)
                                     ->minValue(1)
-                                    ->required(),
+                                    ->required()
+                                    ->maxValue(function (Get $get) {                                        
+                                        $productId = $get('product_id');
+                                        if ($productId) {
+                                            return Product::find($productId)?->jumlah_stok ?? 0;
+                                        }
+                                        return null;
+                                    })                                    
+                                    ->helperText(function (Get $get) {
+                                        $productId = $get('product_id');
+                                        if ($productId) {
+                                            $stok = Product::find($productId)?->jumlah_stok ?? 0;
+                                            
+                                            // Beri peringatan warna jika stok habis
+                                            if ($stok <= 0) {
+                                                return 'Stok Habis!';
+                                            }
+                                            
+                                            return "Sisa stok tersedia: {$stok}";
+                                        }
+                                        return 'Pilih produk untuk melihat sisa stok';
+                                    }),
                             ])
                             ->columns(2)
                             ->defaultItems(1)
@@ -85,7 +112,7 @@ class OfflineTransactionResource extends Resource
 
                 Tables\Columns\TextColumn::make('total_amount')
                     ->label('Total')
-                    ->money('IDR')
+                    ->money('Rp.')
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('notes')
