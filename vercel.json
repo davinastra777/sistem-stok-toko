@@ -6,28 +6,24 @@
     },
     "routes": [
         {
-            "src": "/(favicon\.ico|robots\.txt)",
-            "dest": "/public/$1"
-        },
-        {
             "src": "/build/(.*)",
-            "dest": "/public/build/$1"
+            "dest": "/public/build/"
         },
         {
             "src": "/assets/(.*)",
-            "dest": "/public/assets/$1"
+            "dest": "/public/assets/"
         },
         {
             "src": "/css/(.*)",
-            "dest": "/public/css/$1"
+            "dest": "/public/css/"
         },
         {
             "src": "/images/(.*)",
-            "dest": "/public/images/$1"
+            "dest": "/public/images/"
         },
         {
             "src": "/js/(.*)",
-            "dest": "/public/js/$1"
+            "dest": "/public/js/"
         },
         {
             "src": "/(.*)",
