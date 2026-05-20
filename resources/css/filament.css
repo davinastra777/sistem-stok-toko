@@ -7,6 +7,86 @@
     transition: box-shadow 200ms ease-in-out;
 }
 
+/* Dashboard page hero and card styling */
+.fi-dashboard-page {
+    color: inherit;
+}
+
+.fi-dashboard-hero {
+    background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 35%, #8b5cf6 100%);
+}
+
+.fi-wi-stats-overview {
+    display: grid;
+    gap: 1rem;
+}
+
+.fi-wi-stats-overview .fi-wi-stats-overview-stats-ctn {
+    gap: 1rem;
+}
+
+.fi-wi-stats-overview-stat {
+    background-color: #f8fafc;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    padding: 1.5rem;
+    transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.dark .fi-wi-stats-overview-stat {
+    background-color: #0f172a;
+    border-color: rgba(148, 163, 184, 0.12);
+}
+
+.fi-wi-stats-overview-stat:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 25px 50px -20px rgba(15, 23, 42, 0.25);
+    border-color: rgba(59, 130, 246, 0.35);
+}
+
+.fi-wi-stats-overview-stat-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 9999px;
+    padding: 0.4rem;
+    background-color: rgba(59, 130, 246, 0.12);
+    color: #0ea5e9;
+    transition: background-color 180ms ease, color 180ms ease;
+}
+
+.dark .fi-wi-stats-overview-stat-icon {
+    background-color: rgba(59, 130, 246, 0.14);
+    color: #93c5fd;
+}
+
+.fi-wi-stats-overview-stat-label {
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #64748b;
+}
+
+.dark .fi-wi-stats-overview-stat-label {
+    color: #94a3b8;
+}
+
+.fi-wi-stats-overview-stat-value {
+    color: #0f172a;
+}
+
+.dark .fi-wi-stats-overview-stat-value {
+    color: #f8fafc;
+}
+
+.fi-wi-stats-overview-stat-description {
+    color: #64748b;
+}
+
+.dark .fi-wi-stats-overview-stat-description {
+    color: #94a3b8;
+}
+
 /* Widget system: colors, sizes, layout, and animations */
 .fi-widget {
     background: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.45));

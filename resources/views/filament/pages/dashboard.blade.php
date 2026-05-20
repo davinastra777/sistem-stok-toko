@@ -1,53 +1,51 @@
 <div class="space-y-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    
-    <!-- Section: Omset Penjualan (Aksen Biru/Indigo) -->
-    <section class="group rounded-2xl bg-white shadow-sm ring-1 ring-slate-200/60 overflow-hidden transition-all duration-300 hover:shadow-md hover:ring-blue-200">
-        <!-- Garis Gradien Atas -->
-        <div class="h-2 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-600"></div>
-        
-        <div class="p-6 sm:p-8">
-            <div class="flex items-start justify-between border-b border-slate-100 pb-5">
-                <div class="space-y-2 max-w-3xl">
-                    <h1 class="text-2xl font-bold tracking-tight text-slate-900 group-hover:text-blue-600 transition-colors duration-200">Omset Penjualan</h1>
-                    <p class="text-sm text-slate-500">Ringkasan omset offline, online, dan total penjualan.</p>
+    <section class="overflow-hidden rounded-[2rem] bg-slate-950 text-slate-50 shadow-2xl ring-1 ring-slate-900/15">
+        <div class="bg-gradient-to-r from-sky-600 via-indigo-600 to-violet-600 px-6 py-6 sm:px-8 sm:py-8">
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div class="space-y-3">
+                    <p class="text-sm font-semibold uppercase tracking-[0.25em] text-slate-200/80">Dashboard</p>
+                    <h1 class="text-3xl font-bold tracking-tight text-white">Omset Penjualan</h1>
+                    <p class="max-w-2xl text-sm text-slate-200/80">Ringkasan omset offline, online, dan total penjualan untuk pemantauan cepat dan akurat.</p>
                 </div>
-                <!-- Icon Ilustrasi Penjualan -->
-                <div class="p-3 bg-blue-50 text-blue-600 rounded-xl group-hover:bg-blue-100 transition-colors duration-200 hidden sm:block">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+                <div class="inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/10 px-4 py-3 text-sm text-white shadow-sm backdrop-blur">
+                    <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/15 text-white">
+                        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2"/><path d="M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </span>
+                    <div>
+                        <div class="text-xs uppercase tracking-[0.25em] text-slate-200/80">Status</div>
+                        <div class="text-sm font-semibold text-white">Dashboard Live</div>
+                    </div>
                 </div>
             </div>
+        </div>
 
-            <div class="mt-6 rounded-xl bg-slate-50/60 p-4 ring-1 ring-slate-100">
-                @livewire(\App\Filament\Widgets\LaporanPenjualanOmzet::class)
-            </div>
+        <div class="p-6 sm:p-8">
+            @livewire(\App\Filament\Widgets\LaporanPenjualanOmzet::class)
         </div>
     </section>
 
-    <!-- Section: Ringkasan Gudang (Aksen Hijau/Emerald) -->
-    <section class="group rounded-2xl bg-white shadow-sm ring-1 ring-slate-200/60 overflow-hidden transition-all duration-300 hover:shadow-md hover:ring-emerald-200">
-        <!-- Garis Gradien Atas -->
-        <div class="h-2 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-600"></div>
-        
-        <div class="p-6 sm:p-8">
-            <div class="flex items-start justify-between border-b border-slate-100 pb-5">
-                <div class="space-y-2 max-w-3xl">
-                    <h1 class="text-2xl font-bold tracking-tight text-slate-900 group-hover:text-emerald-600 transition-colors duration-200">Ringkasan Gudang</h1>
-                    <p class="text-sm text-slate-500">Metrik stok dan aktivitas transaksi terbaru untuk membantu kendalikan persediaan.</p>
+    <section class="overflow-hidden rounded-[2rem] bg-white shadow-2xl ring-1 ring-slate-200/80">
+        <div class="border-b border-slate-200/80 px-6 py-6 sm:px-8 sm:py-8">
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div class="space-y-2">
+                    <p class="text-sm font-semibold uppercase tracking-[0.25em] text-slate-500">Ringkasan Gudang</p>
+                    <h2 class="text-2xl font-bold tracking-tight text-slate-900">Ringkasan Gudang</h2>
+                    <p class="max-w-2xl text-sm text-slate-500">Metrik stok dan aktivitas transaksi hari ini dalam tampilan yang lebih rapi.</p>
                 </div>
-                <!-- Icon Ilustrasi Gudang -->
-                <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl group-hover:bg-emerald-100 transition-colors duration-200 hidden sm:block">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-                    </svg>
+                <div class="inline-flex items-center gap-3 rounded-full bg-slate-100 px-4 py-3 text-sm text-slate-600 shadow-sm">
+                    <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-slate-200 text-slate-700">
+                        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/></svg>
+                    </span>
+                    <div>
+                        <div class="text-xs uppercase tracking-[0.25em] text-slate-500">Inventaris</div>
+                        <div class="text-sm font-semibold text-slate-900">Stok real-time</div>
+                    </div>
                 </div>
-            </div>
-
-            <div class="mt-6 rounded-xl bg-slate-50/60 p-4 ring-1 ring-slate-100">
-                @livewire(\App\Filament\Widgets\RingkasanStok::class)
             </div>
         </div>
-    </section>
 
+        <div class="p-6 sm:p-8">
+            @livewire(\App\Filament\Widgets\RingkasanStok::class)
+        </div>
+    </section>
 </div>

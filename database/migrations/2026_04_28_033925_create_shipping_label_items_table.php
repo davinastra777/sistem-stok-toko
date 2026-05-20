@@ -10,22 +10,22 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-   public function up(): void
-{
-    Schema::create('shipping_labels', function (Blueprint $table) {
-        $table->id();
-        $table->string('image');        
-        $table->text('raw_text')->nullable(); 
-        $table->json('items')->nullable();
-        $table->timestamps();
-    });
-}
+    public function up(): void
+    {
+        Schema::create('shipping_label_items', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('shipping_label_id')->constrained('shipping_labels')->cascadeOnDelete();
+            $table->foreignId('product_id')->constrained('products')->cascadeOnDelete();
+            $table->integer('qty')->default(1);
+            $table->timestamps();
+        });
+    }
 
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('shipping_labels');
+        Schema::dropIfExists('shipping_label_items');
     }
 };

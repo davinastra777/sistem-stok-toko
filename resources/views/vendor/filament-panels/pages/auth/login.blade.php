@@ -1,5 +1,6 @@
-﻿<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 p-4">
-    <div class="w-full max-w-md">
+﻿<x-filament-panels::page.simple>
+    <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 p-4">
+        <div class="w-full max-w-md">
 
         {{-- Logo / Branding --}}
         <div class="text-center mb-8">
@@ -37,3 +38,4 @@
         </p>
     </div>
 </div>
+</x-filament-panels::page.simple>

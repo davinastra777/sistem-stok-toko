@@ -73,7 +73,7 @@ class AdminPanelProvider extends PanelProvider
 
                         /* 5. Menu AKTIF secara bawaan dibuat polos transparan */
                         aside.fi-sidebar .fi-sidebar-item-button[aria-current="page"] {
-                            background-color: transparent !important; 
+                            background-color: rgba(59, 130, 246, 0.18) !important; 
                             box-shadow: none !important; 
                         }
                         aside.fi-sidebar .fi-sidebar-item-button[aria-current="page"] .fi-sidebar-item-label,
@@ -84,7 +84,7 @@ class AdminPanelProvider extends PanelProvider
 
                         /* KUNCI PERBAIKAN: Saat menu AKTIF disentuh kursor, berikan warna hover yang sama! */
                         aside.fi-sidebar .fi-sidebar-item-button[aria-current="page"]:hover {
-                            background-color: #1e40af !important; 
+                            background-color: rgba(59, 130, 246, 0.24) !important; 
                         }
                         
                         /* 6. Background halaman utama (Abu-abu sangat terang) */
